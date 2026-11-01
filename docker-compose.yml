@@ -1,0 +1,33 @@
+services:
+  api:
+    build: .
+    container_name: prepvault-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://prepvault:prepvault_password@db:5432/prepvault
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: pgvector/pgvector:pg17
+    container_name: prepvault-db
+    environment:
+      POSTGRES_USER: prepvault
+      POSTGRES_PASSWORD: prepvault_password
+      POSTGRES_DB: prepvault
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U prepvault -d prepvault"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

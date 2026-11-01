@@ -12,25 +12,34 @@ import requests
 RAW = "data/raw"
 MANIFEST = "data/manifest.csv"
 HEADERS = {
-    "User-Agent": "ExamateStudentProject/1.0 (learning project; contact: your-email@example.com)"
+    "User-Agent": "ExamateStudentProject/1.0 (learning project)"
 }
-DELAY = 2  # Seconds between requests
+DELAY = 2
 robots = {}
 
 
 def allowed(url):
-    parsed = urlparse(url)
-    root = f"{parsed.scheme}://{parsed.netloc}"
+    root = "{0.scheme}://{0.netloc}".format(urlparse(url))
 
     if root not in robots:
+        robots_url = root + "/robots.txt"
         rp = RobotFileParser()
-        rp.set_url(root + "/robots.txt")
 
         try:
-            rp.read()
-            robots[root] = rp
-        except Exception:
-            # Fail safely if robots.txt cannot be checked.
+            response = requests.get(
+                robots_url,
+                headers=HEADERS,
+                timeout=10,
+            )
+
+            if response.status_code != 200:
+                robots[root] = None
+            else:
+                rp.set_url(robots_url)
+                rp.parse(response.text.splitlines())
+                robots[root] = rp
+
+        except requests.RequestException:
             robots[root] = None
 
     rp = robots[root]
@@ -48,11 +57,9 @@ def name_for(url):
 
 def main(list_file):
     os.makedirs(RAW, exist_ok=True)
-    os.makedirs(os.path.dirname(MANIFEST), exist_ok=True)
-
     new_manifest = not os.path.exists(MANIFEST)
 
-    with open(MANIFEST, "a", newline="", encoding="utf-8") as mf:
+    with open(MANIFEST, "a", newline="") as mf:
         log = csv.writer(mf)
 
         if new_manifest:
@@ -60,8 +67,8 @@ def main(list_file):
                 ["file", "source_url", "downloaded_on", "bytes", "sha256"]
             )
 
-        with open(list_file, encoding="utf-8") as fh:
-            urls = [url.strip() for url in fh]
+        with open(list_file) as fh:
+            urls = [u.strip() for u in fh]
 
         for url in urls:
             if not url or url.startswith("#"):
@@ -74,45 +81,37 @@ def main(list_file):
                 continue
 
             if not allowed(url):
-                print("BLOCKED by robots.txt or unable to verify:", url)
+                print("BLOCKED by robots.txt, not downloading:", url)
                 continue
 
-            try:
-                response = requests.get(
+            response = requests.get(
+                url,
+                headers=HEADERS,
+                timeout=30,
+            )
+
+            if response.status_code != 200:
+                print("failed", response.status_code, url)
+                continue
+
+            with open(path, "wb") as file:
+                file.write(response.content)
+
+            digest = hashlib.sha256(response.content).hexdigest()[:16]
+
+            log.writerow(
+                [
+                    path,
                     url,
-                    headers=HEADERS,
-                    timeout=30,
-                )
+                    date.today().isoformat(),
+                    len(response.content),
+                    digest,
+                ]
+            )
 
-                if response.status_code != 200:
-                    print("failed", response.status_code, url)
-                    continue
-
-                with open(path, "wb") as file:
-                    file.write(response.content)
-
-                digest = hashlib.sha256(response.content).hexdigest()[:16]
-
-                log.writerow(
-                    [
-                        path,
-                        url,
-                        date.today().isoformat(),
-                        len(response.content),
-                        digest,
-                    ]
-                )
-
-                print("saved", path, len(response.content), "bytes")
-                time.sleep(DELAY)
-
-            except requests.RequestException as exc:
-                print("download error:", url, exc)
+            print("saved", path, len(response.content), "bytes")
+            time.sleep(DELAY)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python tools/download.py <url_list_file>")
-        sys.exit(1)
-
     main(sys.argv[1])

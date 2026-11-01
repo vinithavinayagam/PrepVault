@@ -1,14 +1,41 @@
-## Product
-**Examate – AI-Powered Course Notes Assistant**
+﻿# PrepVault
 
-## Target Users
-College students from different colleges who need quick answers from course notes, especially before tests and exams.
+Examate - AI-Powered Course Notes Assistant
+
+## Product Overview
+A multi-tenant AI-powered course notes assistant for college students.
 
 ## Problem Statement
-Hundreds of students from different colleges ask questions from the same course notes, often the night before a test. One college's students may consume the shared free LLM quota, preventing students from other colleges from getting answers. Additionally, each college must have access only to its own batch materials to protect data privacy and prevent cross-college access.
+Students from different colleges need answers from their course materials. The system must handle high demand, protect college data, and manage shared LLM quotas.
 
 ## Key Challenges
-- **Quota management:** One college must not exhaust the shared LLM quota for everyone.
-- **Data isolation:** Each college should access only its own course and batch materials.
-- **High demand:** The system should handle many students asking questions simultaneously.
-- **Reliable answers:** Answers should be grounded in the uploaded course notes.
+- Quota management
+- College and batch data isolation
+- Handling high traffic
+- Reliable answers grounded in course notes
+
+## Technology Stack
+- Python
+- FastAPI
+- Google Gemini API
+- PostgreSQL
+- pgvector
+- SQLAlchemy
+- Docker Compose
+
+## Current Features
+- Health check API
+- Gemini-powered chat API
+- Usage tracking
+- PostgreSQL integration
+- College, course, document, and document chunk models
+- Docker Compose setup
+
+## Run Locally
+uvicorn app.main:app --reload
+
+## Run with Docker
+docker compose up --build -d
+
+## API Documentation
+http://localhost:8000/docs

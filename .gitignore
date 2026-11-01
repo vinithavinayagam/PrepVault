@@ -13,3 +13,7 @@ data/manifest.csv
 urls.txt
 *.sqlite
 .DS_Store
+
+# Local database and test files
+*.db
+.coverage

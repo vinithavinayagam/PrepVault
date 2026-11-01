@@ -1,1 +1,11 @@
-"""Request and response models. Empty for now; you add these from Session 4."""
+from pydantic import BaseModel, Field
+
+
+class ChatRequest(BaseModel):
+    question: str = Field(min_length=1, max_length=2000)
+
+
+class ChatResponse(BaseModel):
+    question: str
+    answer: str
+    status: str
