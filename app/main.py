@@ -1,4 +1,4 @@
-
+import logging
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException
@@ -16,10 +16,10 @@ from app.usage import (
 )
 
 app = FastAPI(title="Examate RAG starter", version="0.1.0")
+logger = logging.getLogger(__name__)
 
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 
-# Initialize database tables
 initialize_usage_db()
 initialize_database()
 
@@ -46,6 +46,7 @@ def chat(request: ChatRequest) -> ChatResponse:
         )
 
     except Exception as exc:
+        logger.exception("Gemini chat request failed")
         record_usage("failed")
 
         raise HTTPException(
