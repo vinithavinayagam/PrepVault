@@ -17,3 +17,5 @@ urls.txt
 # Local database and test files
 *.db
 .coverage
+
+data/processed/
