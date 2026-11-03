@@ -1,6 +1,7 @@
 
-from pathlib import Path
 import json
+from pathlib import Path
+
 from pypdf import PdfReader
 
 DATA_DIR = Path("data/raw")

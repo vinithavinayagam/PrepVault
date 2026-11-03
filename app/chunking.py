@@ -1,6 +1,6 @@
 
-from pathlib import Path
 import json
+from pathlib import Path
 
 INPUT_FILE = Path("data/processed/extracted_pages.jsonl")
 OUTPUT_FILE = Path("data/processed/chunks.jsonl")
