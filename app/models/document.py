@@ -9,9 +9,7 @@ from app.database import Base
 class Document(Base):
     __tablename__ = "documents"
 
-    id: Mapped[int] = mapped_column(
-        Integer, primary_key=True, index=True
-    )
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
     course_id: Mapped[int] = mapped_column(
         ForeignKey("courses.id"),
@@ -19,13 +17,9 @@ class Document(Base):
         index=True,
     )
 
-    filename: Mapped[str] = mapped_column(
-        String(255), nullable=False
-    )
+    filename: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    file_path: Mapped[str] = mapped_column(
-        String(500), nullable=False
-    )
+    file_path: Mapped[str] = mapped_column(String(500), nullable=False)
 
     uploaded_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

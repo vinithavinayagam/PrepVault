@@ -1,5 +1,5 @@
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import ForeignKey, Integer, Text
+from sqlalchemy import ForeignKey, Integer, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -7,6 +7,15 @@ from app.database import Base
 
 class DocumentChunk(Base):
     __tablename__ = "document_chunks"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "document_id",
+            "page_number",
+            "chunk_index",
+            name="uq_document_page_chunk",
+        ),
+    )
 
     id: Mapped[int] = mapped_column(
         Integer,
@@ -21,6 +30,11 @@ class DocumentChunk(Base):
     )
 
     page_number: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+    )
+
+    chunk_index: Mapped[int] = mapped_column(
         Integer,
         nullable=False,
     )

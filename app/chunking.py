@@ -1,4 +1,3 @@
-
 import json
 from pathlib import Path
 
@@ -38,25 +37,16 @@ def split_text(text):
 def create_chunks():
     total_chunks = 0
 
-    with INPUT_FILE.open("r", encoding="utf-8") as source, \
-         OUTPUT_FILE.open("w", encoding="utf-8") as output:
-
+    with INPUT_FILE.open("r", encoding="utf-8") as source, OUTPUT_FILE.open("w", encoding="utf-8") as output:
         for line_number, line in enumerate(source, start=1):
             page = json.loads(line)
 
             text_chunks = split_text(page["text"])
 
             for index, chunk in enumerate(text_chunks, start=1):
-                record = {
-                    "source": page["source"],
-                    "page": page["page"],
-                    "chunk_index": index,
-                    "text": chunk
-                }
+                record = {"source": page["source"], "page": page["page"], "chunk_index": index, "text": chunk}
 
-                output.write(
-                    json.dumps(record, ensure_ascii=False) + "\n"
-                )
+                output.write(json.dumps(record, ensure_ascii=False) + "\n")
 
                 total_chunks += 1
 

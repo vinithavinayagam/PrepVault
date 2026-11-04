@@ -40,6 +40,4 @@ def test_chat_llm_failure(monkeypatch):
     )
 
     assert response.status_code == 502
-    assert response.json()["detail"] == (
-        "LLM service failed. Please try again."
-    )
+    assert response.json()["detail"] == ("LLM service failed. Please try again.")

@@ -1,4 +1,3 @@
-
 import json
 from pathlib import Path
 
@@ -22,52 +21,34 @@ def extract_pdfs():
 
     try:
         with OUTPUT_FILE.open("w", encoding="utf-8") as output:
-
             for pdf_path in pdf_files:
                 print(f"\nProcessing: {pdf_path.name}")
 
                 try:
                     reader = PdfReader(str(pdf_path))
 
-                    for page_number, page in enumerate(
-                        reader.pages, start=1
-                    ):
+                    for page_number, page in enumerate(reader.pages, start=1):
                         total_pages += 1
 
                         try:
                             text = page.extract_text() or ""
 
                             if text.strip():
-                                record = {
-                                    "source": pdf_path.name,
-                                    "page": page_number,
-                                    "text": text.strip()
-                                }
+                                record = {"source": pdf_path.name, "page": page_number, "text": text.strip()}
 
-                                output.write(
-                                    json.dumps(record, ensure_ascii=False)
-                                    + "\n"
-                                )
+                                output.write(json.dumps(record, ensure_ascii=False) + "\n")
                                 output.flush()
                                 successful_pages += 1
 
                             else:
-                                print(
-                                    f"Empty page: {page_number}"
-                                )
+                                print(f"Empty page: {page_number}")
 
                         except Exception as error:
                             failed_pages += 1
-                            print(
-                                f"Page error: {pdf_path.name}, "
-                                f"page {page_number}: {error}"
-                            )
+                            print(f"Page error: {pdf_path.name}, page {page_number}: {error}")
 
                         if page_number % 25 == 0:
-                            print(
-                                f"Progress: {page_number}/"
-                                f"{len(reader.pages)} pages"
-                            )
+                            print(f"Progress: {page_number}/{len(reader.pages)} pages")
 
                     print(f"Completed: {pdf_path.name}")
 

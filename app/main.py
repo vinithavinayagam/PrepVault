@@ -6,7 +6,13 @@ from fastapi import Depends, FastAPI, HTTPException
 from app.config import Settings, get_settings
 from app.database import initialize_database
 from app.llm import generate_answer
-from app.schemas import ChatRequest, ChatResponse
+from app.rag import generate_rag_answer
+from app.schemas import (
+    AskRequest,
+    AskResponse,
+    ChatRequest,
+    ChatResponse,
+)
 from app.usage import (
     get_usage as read_usage,
 )
@@ -58,3 +64,31 @@ def chat(request: ChatRequest) -> ChatResponse:
 @app.get("/usage")
 def usage() -> dict:
     return read_usage()
+
+
+@app.post("/ask", response_model=AskResponse)
+def ask(request: AskRequest) -> AskResponse:
+    try:
+        result = generate_rag_answer(
+            request.question,
+            request.college_slug,
+        )
+
+        record_usage("success")
+
+        return AskResponse(
+            question=request.question,
+            college_slug=request.college_slug,
+            answer=result["answer"],
+            citations=result["citations"],
+            status="success",
+        )
+
+    except Exception as exc:
+        logger.exception("RAG request failed")
+        record_usage("failed")
+
+        raise HTTPException(
+            status_code=502,
+            detail="RAG service failed. Please try again.",
+        ) from exc
