@@ -21,8 +21,8 @@ Commit after every class. Tag every Friday: `git tag week-N && git push origin w
 ## Week 3 (tag week-3 by Fri 6 Nov)
 - [x] Parser keeps page numbers and headings
 - [x] 500+ pages chunked, embedded and stored in pgvector
-- [ ] POST /ask answers with [document, page] citations
-- [ ] docs/EVAL_v0.md with my 10 questions scored
+- [x] POST /ask answers with [document, page] citations
+- [x] docs/EVAL_v0.md with my 10 questions scored
 - [ ] Tag week-3 pushed
 
 ## Daily log
@@ -31,3 +31,4 @@ Commit after every class. Tag every Friday: `git tag week-N && git push origin w
 | | | |
 | 03 Nov 2026 | Streaming /chat, safe retries, fallback model, cost log, GET /usage | 5564ace |
 | 03 Nov 2026 | Docker Compose (API + pgvector), /ready route, .dockerignore | pending |
+| 04 Nov 2026 | CI workflow (test + docker-smoke), pre-commit hooks, deployed to Render, live link in README | pending |
