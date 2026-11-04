@@ -2,9 +2,10 @@ import logging
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException
+from sqlalchemy import text
 
 from app.config import Settings, get_settings
-from app.database import initialize_database
+from app.database import engine, initialize_database
 from app.llm import generate_answer
 from app.rag import generate_rag_answer
 from app.schemas import (
@@ -37,6 +38,18 @@ def health(settings: SettingsDep) -> dict:
         "app": settings.app_name,
         "environment": settings.environment,
     }
+@app.get("/ready")
+def ready() -> dict:
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+        return {"status": "ready", "database": "connected"}
+    except Exception as exc:
+        logger.exception("Readiness check failed")
+        raise HTTPException(
+            status_code=503,
+            detail="Database is not ready",
+        ) from exc
 
 
 @app.post("/chat", response_model=ChatResponse)
