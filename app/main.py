@@ -38,6 +38,8 @@ def health(settings: SettingsDep) -> dict:
         "app": settings.app_name,
         "environment": settings.environment,
     }
+
+
 @app.get("/ready")
 def ready() -> dict:
     try:

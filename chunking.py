@@ -8,7 +8,7 @@ CHUNK_SIZE = 800
 CHUNK_OVERLAP = 120
 
 
-def split_text(text):
+def split_text(text: str) -> list[str]:
     chunks = []
     start = 0
 
@@ -36,15 +36,21 @@ def split_text(text):
 
 def create_chunks():
     total_chunks = 0
+    total_pages = 0
+
+    OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
 
     with INPUT_FILE.open("r", encoding="utf-8") as source, OUTPUT_FILE.open("w", encoding="utf-8") as output:
         for line_number, line in enumerate(source, start=1):
             page = json.loads(line)
+            total_pages += 1
 
-            text_chunks = split_text(page["text"])
-
-            for index, chunk in enumerate(text_chunks, start=1):
-                record = {"source": page["source"], "page": page["page"], "chunk_index": index, "text": chunk}
+            for index, chunk in enumerate(split_text(page["text"]), start=1):
+                record = {
+                    **page,
+                    "chunk_index": index,
+                    "text": chunk,
+                }
 
                 output.write(json.dumps(record, ensure_ascii=False) + "\n")
 
@@ -54,9 +60,9 @@ def create_chunks():
                 print(f"Processed {line_number} pages")
 
     print("\n========== CHUNKING SUMMARY ==========")
-    print(f"Total pages processed: {line_number}")
+    print(f"Pages processed: {total_pages}")
     print(f"Total chunks created: {total_chunks}")
-    print(f"Output file: {OUTPUT_FILE}")
+    print(f"Output: {OUTPUT_FILE}")
 
 
 if __name__ == "__main__":
